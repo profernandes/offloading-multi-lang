@@ -1,0 +1,148 @@
+package matrix;
+
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.BindableService;
+import io.grpc.stub.StreamObserver;
+import io.grpc.netty.NettyServerBuilder;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
+import java.lang.Double;
+
+import gprotomatrix.*;
+
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+
+public class MatrixServer {
+	private static final Logger logger = Logger.getLogger(MatrixServer.class.getName());
+	private final int port = 50051, N = 100;
+	private Server server;
+	private BindableService greeterService;
+
+	private void start() throws IOException {
+		/* The port on which the server should run */
+		//server = NettyServerBuilder.forPort(port).addService(greeterService).build().start();
+		server = ServerBuilder.forPort(port)
+			.maxInboundMessageSize(50 * 1024 * 1024)
+			.addService(new MatrixServiceImpl()).build().start();
+		logger.info("Server started, listening on " + port);
+		System.out.println("RPCMethod,Language,Operation,OpTime,TotalTime");
+    		Runtime.getRuntime().addShutdownHook(new Thread() {
+      			@Override
+      			public void run() {
+        			// Use stderr here since the logger may have been reset by its JVM shutdown hook.
+        			System.err.println("*** shutting down gRPC server since JVM is shutting down");
+        			try {
+          				MatrixServer.this.stop();
+        			} catch (InterruptedException e) {
+          				e.printStackTrace(System.err);
+        			}
+        			System.err.println("*** server shut down");
+      			}
+    		});
+	}
+
+	private void stop() throws InterruptedException {
+    		if (server != null) {
+      			server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+    		}
+  	}
+
+        private void blockUntilShutdown() throws InterruptedException { 
+		if (server != null) {
+      			server.awaitTermination();
+		}
+	}
+
+	public static void main(String[] args) throws IOException, InterruptedException {
+		final MatrixServer server = new MatrixServer();
+		server.start();
+		server.blockUntilShutdown();
+	}
+
+	static class MatrixServiceImpl extends OperationsGrpc.OperationsImplBase {
+		@Override
+                public void add(InMatrices request, StreamObserver<OutMatrix> responseObserver) {
+                        long init_proc = System.nanoTime();
+
+                        int[][] mat1 = new int[request.getRows()][request.getCols()];
+			RealMatrix m1;
+                        int a = 0, b = 0;
+                        for (Integer value : request.getMat1DataList()) {
+                                mat1[a][b] = value.intValue(); b++;
+                                if (b == request.getCols()) { a++; b = 0; }
+                        }
+
+                        int[][] mat2 = new int[request.getRows()][request.getCols()];
+			RealMatrix m2;
+                        a = 0; b = 0;
+                        for (Integer value : request.getMat2DataList()) {
+                                mat2[a][b] = value.intValue(); b++;
+                                if (b == request.getCols()) { a++; b = 0; }
+                        }
+
+                        long init_op = System.nanoTime();
+                        //ArrayList<Double> product = MatrixOperations.multiplyMatrices(mat1, mat2, request.getRows(), request.getCols());
+                        OutMatrix reply = OutMatrix.newBuilder()
+                                .addAllData(MatrixOperations.sumMatrices(mat1, mat2, request.getRows(), request.getCols()))
+				.setCols(request.getCols())
+                                .setRows(request.getRows()).build();
+                        long end_op = System.nanoTime();
+
+                        responseObserver.onNext(reply);
+                        long end_proc = System.nanoTime();
+
+                        //System.out.println("Process: " + (end_proc - init_proc) + "ms | Operation: " + (end_op - init_op) + "ms");
+                        System.out.println("gRPCProto,Java,Sum," + ((end_proc - init_proc) / 1000000) + "," + ((end_op - init_op) / 1000000));
+                        responseObserver.onCompleted();
+
+                }
+
+		@Override
+		public void multiply(InMatrices request, StreamObserver<OutMatrix> responseObserver) {
+			long init_proc = System.nanoTime();
+
+			//int[][] mat1 = new int[request.getRows()][request.getCols()];
+			RealMatrix m1 = new Array2DRowRealMatrix(request.getRows(), request.getCols());
+                        int a = 0, b = 0;
+                        for (Integer value : request.getMat1DataList()) {
+				m1.addToEntry(a, b, value.intValue());
+                                //mat1[a][b] = value.intValue(); b++;
+                                if (b == request.getCols()) { a++; b = 0; }
+                        }
+
+                        //int[][] mat2 = new int[request.getRows()][request.getCols()];
+			RealMatrix m2 = new Array2DRowRealMatrix(request.getRows(), request.getCols());
+                        a = 0; b = 0;
+                        for (Integer value : request.getMat2DataList()) {
+				m2.addToEntry(a, b, value.intValue()); 
+                                //mat2[a][b] = value.intValue(); b++;
+                                if (b == request.getCols()) { a++; b = 0; }
+                        }
+
+                        long init_op = System.nanoTime();
+                        //ArrayList<Double> product = MatrixOperations.multiplyMatrices(mat1, mat2, request.getRows(), request.getCols());
+			RealMatrix res = m1.multiply(m2);
+			OutMatrix reply = OutMatrix.newBuilder()
+                                .addAllData(MatrixOperations.multiplyMatrices(mat1, mat2, request.getRows(), request.getCols()))
+				.setCols(request.getCols())
+				.setRows(request.getRows()).build();
+                        long end_op = System.nanoTime();
+
+
+                        responseObserver.onNext(reply);
+                        long end_proc = System.nanoTime();
+
+			//System.out.println("Process: " + (end_proc - init_proc) + "ms | Operation: " + (end_op - init_op) + "ms");
+                        System.out.println("gRPCProto,Java,Mult," + ((end_proc - init_proc) / 1000000) + "," + ((end_op - init_op) / 1000000));
+			responseObserver.onCompleted();
+
+		}		
+	}
+}

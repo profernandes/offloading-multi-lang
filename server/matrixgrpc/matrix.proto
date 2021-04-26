@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package gprotomatrix;
+
+option java_multiple_files = true;
+/*option java_package = "grpcproto";
+option java_outer_classname = "MatrixProto";
+option objc_class_prefix = "HLW";*/
+
+service Operations {
+  rpc Add (InMatrices) returns (OutMatrix) {}
+  rpc Multiply (InMatrices) returns (OutMatrix) {}
+}
+
+message InMatrices {
+  int32 rows = 1;
+  int32 cols = 2;
+  repeated int32 mat1_data = 3;
+  repeated int32 mat2_data = 4;
+}
+
+message OutMatrix {
+  int32 rows = 1;
+  int32 cols = 2;
+  repeated int32 data = 3;
+}
