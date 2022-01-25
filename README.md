@@ -2,7 +2,7 @@
 
 ## Contextualization:
 
-This repository contains the source codes of the Android client applications and the C++, Go, Java, and Python server processes used in the experiments carried out that generated the article **"An Empirical Study about the Adoption of Multi-language Technique in Computation Offloading in a Mobile Cloud Computing Scenario"** published at the *11th International Conference on Cloud Computing and Services Science (CLOSER 2021).* For more information about the experiments, we suggest reading the [paper](https://www.insticc.org/node/TechnicalProgram/closer/2021/presentationDetails/104378).
+This repository contains the source codes of the Android client applications and the C++, Go, Java, and Python server processes used in the experiments carried out that generated the article **"An Empirical Study about the Adoption of Multi-language Technique in Computation Offloading in a Mobile Cloud Computing Scenario"** published at the *11th International Conference on Cloud Computing and Services Science (CLOSER 2021).* For more information about the experiments, we suggest reading the [paper](https://www.scitepress.org/PublicationsDetail.aspx?ID=8F4V9bepymE=&t=1).
 
 The repository has two main folders in its root directory: *server/* (dedicated to server process codes) and *client/* (dedicated to the Android Studio projects of the client applications). Internally, each of these folders has two other folders: one for each application used in the experiments.
 
