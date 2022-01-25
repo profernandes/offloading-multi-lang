@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package benchimage;
+
+option java_multiple_files = true;
+//option java_package = "benchimagegrpc";
+//option java_outer_classname = "ImageProto";
+//option objc_class_prefix = "HLW";
+
+service FilterGRPC {
+  rpc GrayscaleFilter (ImageGRPC) returns (ImageGRPC) {}
+  rpc InvertFilter (ImageGRPC) returns (ImageGRPC) {}
+  //rpc CartoonFilter (ImageGRPC) returns (ImageGRPC) {}
+  //rpc PencilFilter (ImageGRPC) returns (ImageGRPC) {}
+  //rpc SobelFilter (ImageGRPC) returns (ImageGRPC) {}
+}
+
+message ImageGRPC {
+  repeated bytes content = 1;
+}

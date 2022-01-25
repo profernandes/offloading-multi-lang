@@ -1,0 +1,91 @@
+apply plugin: 'com.android.application'
+//apply plugin: 'com.google.protobuf'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+    defaultConfig {
+        applicationId "com.example.anderson.benchimage"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/*'
+        exclude 'grpc/testing/messages.proto'
+    }
+}
+
+/*protobuf {
+    protoc { artifact = 'com.google.protobuf:protoc:3.11.0' }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.26.0' // CURRENT_GRPC_VERSION
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java { option 'lite' }
+            }
+            task.plugins {
+                grpc { // Options added to --grpc_out
+                    option 'lite' }
+            }
+        }
+    }
+}*/
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'io.opencensus:opencensus-api:0.25.0'
+    implementation 'io.opencensus:opencensus-contrib-grpc-metrics:0.21.0'
+    implementation 'com.squareup.okio:okio:2.4.3'
+    implementation 'io.perfmark:perfmark-api:0.20.1'
+
+    implementation "com.google.guava:guava:28.2-android"
+    implementation 'javax.annotation:javax.annotation-api:1.2'
+
+    implementation "io.grpc:protoc-gen-grpc-java:1.26.0"
+    implementation "io.grpc:grpc-all:1.28.1"
+
+    implementation 'org.conscrypt:conscrypt-android:2.5.1'
+
+    implementation 'commons-io:commons-io:2.8.0'
+
+
+    //implementation "com.google.flatbuffers:flatbuffers-java:1.12.0"
+
+    //implementation 'com.microsoft.thrifty:thrifty-runtime:1.0.0'
+    //implementation 'com.microsoft.thrifty:thrifty-runtime:0.4.3'
+    /*implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'com.google.protobuf:protobuf-java:3.11.1'
+    implementation 'io.opencensus:opencensus-api:0.25.0'
+    implementation 'io.opencensus:opencensus-contrib-grpc-metrics:0.21.0'
+    implementation 'com.squareup.okio:okio:2.4.3'
+    implementation 'io.perfmark:perfmark-api:0.20.1'
+
+    implementation "com.google.guava:guava:28.2-android"
+    implementation 'javax.annotation:javax.annotation-api:1.2'
+
+    implementation "io.grpc:protoc-gen-grpc-java:1.26.0"
+    implementation "io.grpc:grpc-all:1.28.1"
+
+    implementation "com.google.flatbuffers:flatbuffers-java:1.12.0"
+
+    //implementation 'com.microsoft.thrifty:thrifty-runtime:1.0.0'
+    implementation 'com.microsoft.thrifty:thrifty-runtime:0.4.3'*/
+}
